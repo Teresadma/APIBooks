@@ -31,26 +31,33 @@ const postLogin  = async (request,response) =>
 {
     try 
     {
-        console.log(request.body);
-        let params = [];
+        
+        let respuesta;
         let sql = "SELECT id_user, name_user, last_name_user, email, photo FROM user WHERE email = ? AND password = ?";
-        params = [request.body.email,
+        let params = [request.body.email,
                 request.body.password];
 
-        let [result] = await pool.query (sql, params);
-
-        if (result.length === 0){
-            response.json({
-                error:true,
-                codigo:200,
-                mensaje:"Los datos son incorrectos"});
+        let res = await pool.query (sql, params);
+        if (res[0].length > 0){
+            respuesta = {
+            error:false,
+            codigo:200,
+            mensaje:"Los datos son correctos",
+            data_user: res[0]};
         }else{
-            response.json(result[0]);
-        }}
+            respuesta = {
+            error:true,
+            codigo:200,
+            mensaje:"Los datos son incorrectos",
+            data_user: null};
+        }
+        response.send(respuesta)
+      }
         catch (err)
         {
             console.log(err)
         }
+        
 }
 
 const editProfile = async (request, response) => {

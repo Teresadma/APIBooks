@@ -4,17 +4,28 @@ const getBooks = async (request,response) =>
 {
     try
     {
-        let params = [];
-        let sql = "SELECT * FROM book INNER JOIN user ON (book.id_user = user.id_user) WHERE user.id_user = ?";
-        params = [request.params.id_user];
-        let [result] = await pool.query(sql,params);
+     
+        let respuesta;
+        let sql = "SELECT * FROM book WHERE id_user = ?";
+        let params = [request.params.id_user];
+        let res = await pool.query(sql,params);
         
-        if (result)
-            response.json(result);
-        else 
-            console.log("-1");
+        if (res[0].length > 0){
+            respuesta = {
+            error:false,
+            codigo:200,
+            mensaje:"Libros disponibles",
+            data: res[0]};
+        }else{
+            respuesta = {
+            error:true,
+            codigo:200,
+            mensaje:"No hay libros",
+            data: null};
+        }
+        response.send(respuesta)
     }
-    catch
+    catch(err)
     {
         console.log(err);
     }
@@ -24,87 +35,107 @@ const getBooksID = async (request,response) =>
     try
     {
         let params = [];
-        let sql = "SELECT * FROM book INNER JOIN user ON (book.id_user = user.id_user) WHERE user.id_user = ? AND id_book= ?";
+        let sql = "SELECT * FROM book  WHERE id_user = ? AND id_book= ?";
         params = [request.params.id_user,
                 request.params.id_book];
-        let [result] = await pool.query(sql,params);
+        let res = await pool.query(sql,params);
+        console.log(res)
         
-        if (result)
-            response.send(result);
-        else 
-            response.send("-1");
+        if (res[0].length > 0){
+            respuesta = {
+            error:false,
+            codigo:200,
+            mensaje:"Libros disponibles",
+            data: res[0]};
+        }else{
+            respuesta = {
+            error:true,
+            codigo:200,
+            mensaje:"No hay libros",
+            data: null};
+        }
+        response.send(respuesta)
+        console.log(respuesta.data)
     }
-    catch
+    catch (err)
     {
         console.log(err);
     }
 }
 
-const postBook = async (request,response) => 
-{
-    try
-    {
-        console.log(request.body)
-        let params = [];
-        let sql = "INSERT INTO book (id_user,title,type,author,price,photo) VALUES (?, ?, ?, ?, ?, ?)";
-        params = [request.body.id_user,
-                request.body.title,
-                request.body.type,
-                request.body.author,
-                request.body.price,
-                request.body.photo];
-                console.log(sql);
-        let [result] = await pool.query(sql,params);
-        console.log(result);
+// const postBook = async (request,response) => 
+// {
+//     try
+//     {
+//         console.log(request.body)
+//         let params = [];
+//         let sql = "INSERT INTO book (id_user,title,type,author,price,photo) VALUES (?, ?, ?, ?, ?, ?)";
+//         params = [request.body.id_user,
+//                 request.body.title,
+//                 request.body.type,
+//                 request.body.author,
+//                 request.body.price,
+//                 request.body.photo];
+//                 console.log(sql);
+//         let [result] = await pool.query(sql,params);
+//         console.log(result);
         
-        if (result.insertId)
-            response.send(String(result.insertId));
-        else 
-            response.send("-1");
-    }
-    catch (error)
-    {
-        response.send(error)
-    }
-}
+//         if (res[0].length > 0){
+//             respuesta = {
+//             error:false,
+//             codigo:200,
+//             mensaje:"Libros disponibles",
+//             data: res[0]};
+//         }else{
+//             respuesta = {
+//             error:true,
+//             codigo:200,
+//             mensaje:"No hay libros",
+//             data: null};
+//         }
+//         response.send(respuesta)}
+//     catch (error)
+//     {
+//         response.send(error)
+//     }
+// }
 
-const putBook = async (request, response) => 
-{
-    try
-    {
-        console.log(request.body)
-        let params = [];
-        let sql = "UPDATE book SET id_user = ?, title = ?, type = ?, author = ?, price = ?, photo = ? WHERE id_book = ?";
-        params = [request.body.id_book,
-                request.body.id_user,
-                request.body.title,
-                request.body.type,
-                request.body.author,
-                request.body.price,
-                request.body.photo];
-        console.log(sql);
-        let [result] = await pool.query(sql,params);
-        if (result)
-            response.send(result);
-        else 
-            response.send("-1");
+// const putBook = async (request, response) => 
+// {
+//     try
+//     {
+//         console.log(request.body)
+//         let params = [];
+//         let sql = "UPDATE book SET id_user = ?, title = ?, type = ?, author = ?, price = ?, photo = ? WHERE id_book = ?";
+//         params = [request.body.id_book,
+//                 request.body.id_user,
+//                 request.body.title,
+//                 request.body.type,
+//                 request.body.author,
+//                 request.body.price,
+//                 request.body.photo];
+//         console.log(sql);
+//         let [result] = await pool.query(sql,params);
+//         if (result)
+//             response.send(result);
+//         else 
+//             response.send("-1");
 
-    }
-    catch (error)
-    {
-        response.send(error)
-    }
-} 
+//     }
+//     catch (error)
+//     {
+//         response.send(error)
+//     }
+// } 
 
 const deleteBook = async (request,response) =>
 {
     try
     {
-        console.log(request.body)
         let params = [];
         let sql = "DELETE FROM book WHERE id_book = ?";
         console.log(sql);
-        params = [request.body.id_book]
+        params = [request.params.id_book]
         let [result] = await pool.query(sql,params);
         if (result)
             response.send(result);
@@ -119,4 +150,5 @@ const deleteBook = async (request,response) =>
 }
 
 
-module.exports = {getBooks, getBooksID, postBook, putBook, deleteBook}
+module.exports = {getBooks, getBooksID, deleteBook}
+//  postBook, putBook
